@@ -95,7 +95,7 @@ if __name__ == "__main__":
         term1 = term1.mean("lon")
         term2 = term2.mean("lon")
         prec_mean = prec.mean("lon")
-        term3 = prec.values / qv_h
+        term3 = qv_h*1000.
         term3= term3.mean("lon")
 
         axs[0,0].plot(x,Fh_mean, color=colors[i], lw=lw)
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         axs[1,1].plot(x,delta_S_mean,color=colors[i], label=labels[i], lw=lw)
 
         axs[2,0].plot(x,term1[0,:], color=colors[i], lw=lw)
-        axs[2,1].plot(x,term2[0,:],color=colors[i], lw=lw)
+        axs[2,1].plot(x,term2[0,:],color=colors[i], label=labels[i], lw=lw)
 
         axs[0,2].plot(x,Mu_mean,color=colors[i], lw=lw)
 
@@ -120,7 +120,7 @@ if __name__ == "__main__":
 
     titles=['(a) Fh', '(b) Q','(c) Mu','(d) hb-hm','(e) '+r'$\Delta$'+'s',
             '(f) '+r'$\epsilon_p$', '(g) Fh/(hb-hm)','(h) Q/'+r'$\Delta$'+'s',
-            '(i) Pr/<qv>']
+            '(i) <qv>']
             #'(i) (1-'+r'$\epsilon_p$'+')Mu']
     for i,ax in enumerate(axs.flat):
         ax.set_xlim(-20,20)
@@ -131,13 +131,13 @@ if __name__ == "__main__":
     axs[0,0].set_ylim(88,160)
     axs[0,0].set_ylabel('[W m'+r'$^{-2}$'+']')
     axs[0,1].set_ylim(0,0.03)
-    axs[1,0].set_ylim(3,14)
+    axs[1,0].set_ylim(7,12)
     axs[1,0].set_ylabel('[kJ kg'+r'$^{-1}$'+']')
-    axs[1,1].set_ylim(3,14)
+    axs[1,1].set_ylim(12,17)
     #axs[1,1].label_outer()
-    axs[2,0].set_ylim(0,0.035)
-    axs[2,1].set_ylim(0,0.035)
-    axs[2,2].set_ylim(0,0.035)
+    axs[2,0].set_ylim(0.008,0.016)
+    axs[2,1].set_ylim(0,0.008)
+    axs[2,2].set_ylim(0,5)
     axs[2,0].set_ylabel('[kg m'+r'$^{-2}$'+' s'+r'$^{-1}$'+']')
     #axs[1,2].set_ylabel('[kg m'+r'$^{-2}$'+' s'+r'$^{-1}$'+']',fontsize=fs)
     axs[0,2].set_ylim(0.01,0.06)
@@ -155,11 +155,11 @@ if __name__ == "__main__":
     #axs[0,2].set_ylabel('[kg m'+r'$^{-2}$'+' s'+r'$^{-1}$'+']',fontsize=fs)
     #axs[0,2].set_ylabel('[mm day'+r'$^{-1}$'+']')
 
-    axs[1,1].legend(loc='center',frameon=False)
+    axs[2,1].legend(loc='center',frameon=False, ncol=2)
     #plt.subplots_adjust(bottom = 0.05)
 
     #for i in range(3):
     #    axs[2,i].set_xlabel('lat',fontsize=fs)
     #    axs[2,i].set_xticks([-20,-10,0,10,20])
 
-    plt.savefig('fig/ke_var.png')
+    plt.savefig('fig/ke_var_full.png')

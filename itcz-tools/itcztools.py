@@ -89,7 +89,6 @@ def my_plot():
     return fig, np.array([[ax0, ax1], [ax2,ax3], [ax4,ax5]]).transpose()
 
 if __name__ == "__main__":
-    fig, axs =my_plot()
     fig, axs = plt.subplots(2,3, figsize=(12,6), sharex=True)
     fig.subplots_adjust(wspace=0.4, hspace=0.25, bottom=0.18,left=0.08,right=0.98)
 
