@@ -5,6 +5,7 @@ import pandas as pd
 import glob
 from matplotlib.ticker import MultipleLocator
 import os
+from itcztools import f_slope, find_fluxes
 import sys
 sys.path.append("/project/meteo/w2w/B6/Hyunju/plotting")
 from my_subplots import plot9x9
@@ -28,48 +29,6 @@ z_ifc=xr.open_dataset("../../z_ifc.nc")['z_ifc']
 z_ifc=z_ifc.where(z_ifc.height_2 >= 25., drop=True)
 z_full = 0.5*(z_ifc[:-1] + z_ifc[1:].values)
 z_full = z_full.rename({'height_2':'height'})
-
-def f_slope(X,Y,ax=0):
-    s=np.diff(Y, axis=ax)/np.diff(X,axis=ax)
-    
-    return np.mean(s, axis=ax)
-
-def find_fluxes(odir):
-    
-    #Different inital time for the runs
-    #to convert accumulated vars to averaged ones
-    if odir == 'P5':
-        ofiles = glob.glob("%s/%s/nature_run_DOM01_ML_????.nc" % (opath2, odir))
-        ofiles = sorted(ofiles)
-        
-        itime = np.datetime64('2020-11-10T00')
-        
-    elif odir == 'E5':
-        ofiles = glob.glob("%s/%s/nature_run_DOM01_ML_*.nc" % (opath2, odir))
-        ofiles = sorted(ofiles)
-        
-        itime = np.datetime64('2020-11-10T00')
-        
-    else:
-        ofiles = glob.glob("%s/natureruns_new/%s/nature_run_DOM01_ML_*.nc" % (opath, odir) )
-        ofiles = sorted(ofiles)
-        ofiles = [ofiles[-961], ofiles[-1]]
-        
-        itime=np.datetime64('2020-07-31T00')
-    
-    ds = xr.open_mfdataset(ofiles)
-    ds = ds.where(ds.lon < 180., drop=True)
-    
-    time = ds.time.values - itime  
-    
-    time = time*1e-9
-    time = time.astype(float)
-    
-    Fh = ds.alhfl_s + ds.ashfl_s
-    Fh = - time[:,np.newaxis, np.newaxis]*Fh
-    Fh = Fh.diff('time') / np.diff(time, axis = 0)
-    
-    return Fh
 
 if __name__ == "__main__":
     axs=plot9x9()
