@@ -1,6 +1,7 @@
 import xarray as xr
 from enstools.io import read
 import numpy as np
+import pandas as pd
 import glob
 import argparse
 import pickle
@@ -48,11 +49,21 @@ def cal_fluxes(odir, da):
     
     time = time*1e-9
     time = time.astype(float)
+    time = time[:,np.newaxis, np.newaxis]
     
-    flx = - time[:,np.newaxis, np.newaxis]*da
+    flx = - time*da
     flx = flx.diff('time') / np.diff(time, axis = 0)
     
     return flx
+
+def drop_timestep(ds):
+    for one_time in ds.time.values:
+        dt=pd.to_datetime(one_time)
+        
+        if int(dt.strftime('%M')) != 0:
+            ds = ds.drop_sel(time = one_time)
+            
+    return ds
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser(description="averaged var to instantaneous")
@@ -68,7 +79,9 @@ if __name__=="__main__":
     
     ds1 = read( find_2files(args.sfc_source) )
     ds2 = read( find_2files(args.nt_source) )
+    ds2 = drop_timestep(ds2) # two time steps -> one time step in E5
     ds2 = ds2.where(ds2.lon < 180., drop=True)
+    print(ds2.time.values)
     
     #average as surface fluxes are averaged values
     temp=0.5*(ds1.temp[0,0,:,:].values + ds1.temp[1,0,:,:])
@@ -81,8 +94,6 @@ if __name__=="__main__":
     lh=cal_fluxes(args.dest, ds2.alhfl_s)
     sh=cal_fluxes(args.dest, ds2.ashfl_s)
 
-    print(lh)
-    print(u)
     nlat=ds1.dims['lat']
     nlon=ds1.dims['lon']
     dz=z_full[-1]
@@ -106,9 +117,7 @@ if __name__=="__main__":
     ce=lh/(Lv*usfc*dqv*rho)
     ch=sh/(cp*usfc*dtemp*rho)
 
-    print(ce)
     time_in = ds1.time[:1]
-    print(time_in)
     new_ds = xr.Dataset()
     new_ds['ce'] = xr.DataArray(ce.values, coords=[time_in, ds1.lat, ds1.lon], dims=['time','lat','lon'])
     new_ds['ch'] = xr.DataArray(ch.values, coords=[time_in, ds1.lat, ds1.lon], dims=['time','lat','lon'])
