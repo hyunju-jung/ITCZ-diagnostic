@@ -33,6 +33,20 @@ def find_int(fname):
     return f_int
 
 def cal_fluxes(odir, da):
+    """
+    Translate accumlated variables such as surface latent heat flux
+    into 'instanteneous' variables.
+    
+    Inputs
+    ------
+    odir: directory that indicates what aquachannel runs is
+    da: DataArray of accumulated field
+    
+    Returns
+    -------
+    DataArray: instanteneous var
+    
+    """
     
     #Different inital time for the runs
     #to convert accumulated vars to averaged ones
@@ -57,6 +71,20 @@ def cal_fluxes(odir, da):
     return flx
 
 def drop_timestep(ds):
+    """
+    Drop time step that is not intended to simulate
+    
+    Paramters
+    ---------
+    ds : xarray.Dataset or xarray.DataArray
+    
+    Returns
+    -------
+    ds : xarray.Dataset or xarray.DataArray
+    
+    Corrected Dataset without unintended time step
+    """
+    
     for one_time in ds.time.values:
         dt=pd.to_datetime(one_time)
         
