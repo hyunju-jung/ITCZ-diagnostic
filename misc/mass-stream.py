@@ -18,7 +18,7 @@ def ind_min(a):
 np.set_printoptions(suppress=True)
 
 HOME=os.path.expanduser("~")
-opath='%s/B6/Hyunju/mse-diagnostics/conceptual-model/data/' % HOME
+opath='%s/B6/Hyunju/mse-budget/conceptual-model/data/' % HOME
 flists=['param', 'explicit', 'shallow','stochastic_shallow', 
         'P5', 'E5']
 titles=['(a) P13', '(b) E13', '(c) S13', '(d) SS13', '(e) P5', '(f) E5']
@@ -57,10 +57,10 @@ new_cmap.set_under(new_colors[0])
 for i, od in enumerate(flists):
     axs[i].set_title(titles[i], loc='left')
         
-    u=xr.open_dataset(opath+od+'/obs_DOM01_ML_reg_u_timeavg.nc')['u']
+    u=xr.open_dataset('%s/%s/obs_DOM01_ML_reg_u_timeavg.nc' % (opath, od))['u']
     u=u.mean('lon')
     
-    v=xr.open_dataset(opath+od+'/obs_DOM01_ML_reg_v_timeavg.nc')['v']
+    v=xr.open_dataset('%s/%s/obs_DOM01_ML_reg_v_timeavg.nc' % (opath, od))['v']
     v=v.mean('lon')
 
     #---Zonal wind---
