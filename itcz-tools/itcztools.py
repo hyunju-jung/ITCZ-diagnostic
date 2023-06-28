@@ -9,7 +9,7 @@ import os
 plt.rcParams.update({'font.size': 18})
 opath="/archive/meteo/w2w-p2/B6"
 opath2="../../mse-budget/conceptual-model/data"
-flists=['param','shallow','stochastic_shallow','explicit','P5','E5']
+flists=['param','explicit','shallow','stochastic_shallow','P5','E5']
 
 np.set_printoptions(suppress=True)
 
@@ -36,7 +36,23 @@ def f_slope(X,Y,ax=0):
     
     return np.mean(s, axis=ax)
 
-def find_fluxes(odir):
+def find_fluxes(odir, flux_vars):
+    """
+    
+    Parameters
+    ----------
+    
+    odir : string
+    
+    flux_vars : list
+        ['alhfl_s']
+    
+    Returns
+    -------
+    
+    flx : xarray.DataArray
+    
+    """
     
     #Different inital time for the runs
     #to convert accumulated vars to averaged ones
@@ -67,11 +83,16 @@ def find_fluxes(odir):
     time = time*1e-9
     time = time.astype(float)
     
-    Fh = ds.alhfl_s + ds.ashfl_s
-    Fh = - time[:,np.newaxis, np.newaxis]*Fh
-    Fh = Fh.diff('time') / np.diff(time, axis = 0)
+    for i, onetime_var in enumerate(flux_vars):
+        if i == 0:
+            flx = ds[onetime_var]
+        else:
+            flx = flx + ds[onetime_var]
+
+    flx = - time[:,np.newaxis, np.newaxis]*flx
+    flx = flx.diff('time') / np.diff(time, axis = 0)
     
-    return Fh
+    return flx
 
 def my_plot():
     fig = plt.figure(figsize=(11,5), constrained_layout=False)
@@ -94,7 +115,9 @@ if __name__ == "__main__":
 
     for i, od in enumerate(flists):
         #obtain Fh
-        Fh = find_fluxes(od)
+        Fh = find_fluxes(od, ['alhfl_s','ashfl_s'])
+        lh = find_fluxes(od, ['alhfl_s'])
+        sh = find_fluxes(od, ['ashfl_s'])
         
         #obtain hb-hm
         h = xr.open_dataset("%s/%s/ke_var_timeavg.nc" % (opath2, od))['h']
@@ -148,10 +171,10 @@ if __name__ == "__main__":
 
         #print('---------ITCZ: %s---------' % od)
         print('prec: %.2f' %  (prec * weight * 86400.).sel(lat = slice(-5,5)).mean())
-        print('<qv>: %.2f' %  (qv_h * weight *1000.).sel(lat = slice(-5,5)).mean())
-        print('Mu: %.4f' %  (Mu * weight).sel(lat = slice(-5,5)).mean())
-        print('ep: %.3f' %  (ep * weight).sel(lat = slice(-5,5)).mean())
-        print('Fh: %.1f' %  (Fh * weight).sel(lat = slice(-5,5)).mean())
+        #print('<qv>: %.2f' %  (qv_h * weight *1000.).sel(lat = slice(-5,5)).mean())
+        #print('Mu: %.4f' %  (Mu * weight).sel(lat = slice(-5,5)).mean())
+        #print('ep: %.3f' %  (ep * weight).sel(lat = slice(-5,5)).mean())
+        #print('Fh: %.1f' %  (Fh * weight).sel(lat = slice(-5,5)).mean())
 
         #print('---------outer: %s---------' % od)
         #print('Fh: %.1f' %  print_var(Fh * weight))
@@ -171,6 +194,8 @@ if __name__ == "__main__":
         x=hb_hm.lat
 
         axs[0,0].plot(x,Fh_mean, color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
+        #axs[0,0].plot(x,lh.mean(['time','lon']), color=colors[i], lw=1, ls=ls[i], zorder=zo[i])
+        #axs[0,0].plot(x,sh.mean(['time','lon']), color=colors[i], lw=1, ls=ls[i], zorder=zo[i])
         axs[1,0].plot(x,hb_hm_mean*0.001,color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
         axs[0,1].plot(x,Q_mean, color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
         axs[1,1].plot(x,delta_S_mean,color=colors[i], lw=lw, label=labels[i], ls=ls[i], zorder=zo[i])
@@ -194,9 +219,9 @@ if __name__ == "__main__":
         ax.tick_params(axis='y')
         ax.xaxis.set_minor_locator(MultipleLocator(5))
 
-    axs[0,0].set_ylim(88,160)
+    axs[0,0].set_ylim(60,160)#(88,160)
     axs[0,0].set_ylabel('[W m'+r'$^{-2}$'+']')
-    axs[0,0].set_yticks([100,125,150])
+    #axs[0,0].set_yticks([100,125,150])
     axs[0,1].set_ylim(0,0.03)
     axs[0,1].set_ylabel('[W m'+r'$^{-3}$'+']')
     axs[1,0].set_ylim(6,12)

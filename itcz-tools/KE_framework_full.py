@@ -6,20 +6,19 @@ import glob
 from matplotlib.ticker import MultipleLocator
 import os
 from itcztools import f_slope, find_fluxes
-import sys
-sys.path.append("/project/meteo/w2w/B6/Hyunju/plotting")
-from my_subplots import plot9x9
 
 plt.rcParams.update({'font.size': 18})
 opath="/archive/meteo/w2w-p2/B6"
 opath2="../../mse-budget/conceptual-model/data"
-flists=['param','shallow','stochastic_shallow','explicit','P5','E5']
+flists=['param','explicit','shallow','stochastic_shallow','P5','E5']
 
 np.set_printoptions(suppress=True)
 
-colors = ['black','#1AB2FF','#654CFF','#E51932','#8D8D8D','#FF99BF']
-labels=['P13','S13','SS13','E13','P5','E5']
+colors = ['black','#E51932','#1AB2FF','#654CFF','#8D8D8D','#FF99BF']
+labels=['P13','E13','S13','SS13','P5','E5']
 lw=2
+ls = list(['solid'])*4 + list(['dashdot'])*2
+zo=[0,3,1,2,4,5]
 
 height_b = 84.
 hm_1=84.
@@ -31,10 +30,13 @@ z_full = 0.5*(z_ifc[:-1] + z_ifc[1:].values)
 z_full = z_full.rename({'height_2':'height'})
 
 if __name__ == "__main__":
-    axs=plot9x9()
+    fig, axs = plt.subplots(3,3, figsize=(12,10), sharex=True)
+    fig.subplots_adjust(wspace=0.45, hspace=0.25, bottom=0.15,left=0.1,
+                        right=0.98, top=0.95)
+    
     for i, od in enumerate(flists):
         #obtain Fh
-        Fh = find_fluxes(od)
+        Fh = find_fluxes(od, ['alhfl_s','ashfl_s'])
         
         #obtain hb-hm
         h = xr.open_dataset("%s/%s/ke_var_timeavg.nc" % (opath2, od))['h']
@@ -98,49 +100,54 @@ if __name__ == "__main__":
         term3 = qv_h*1000.
         term3= term3.mean("lon")
 
-        axs[0,0].plot(x,Fh_mean, color=colors[i], lw=lw)
+        axs[0,0].plot(x,Fh_mean, color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
 
-        axs[0,1].plot(x,Q_mean, color=colors[i], lw=lw)
-        axs[1,0].plot(x,hb_hm_mean*0.001,color=colors[i], lw=lw)
-        axs[1,1].plot(x,delta_S_mean,color=colors[i], label=labels[i], lw=lw)
+        axs[0,1].plot(x,Q_mean, color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
+        axs[1,0].plot(x,hb_hm_mean*0.001,color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
+        axs[1,1].plot(x,delta_S_mean,color=colors[i], label=labels[i], lw=lw, ls=ls[i], zorder=zo[i])
 
-        axs[2,0].plot(x,term1[0,:], color=colors[i], lw=lw)
-        axs[2,1].plot(x,term2[0,:],color=colors[i], label=labels[i], lw=lw)
+        axs[2,0].plot(x,term1[0,:], color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
+        axs[2,1].plot(x,term2[0,:],color=colors[i], label=labels[i], lw=lw, ls=ls[i], zorder=zo[i])
 
-        axs[0,2].plot(x,Mu_mean,color=colors[i], lw=lw)
+        axs[0,2].plot(x,Mu_mean,color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
 
-        axs[2,2].plot(x, term3[0,:], color=colors[i], lw=lw)
-        axs[1,2].plot(x, ep_mean, color=colors[i], lw=lw)
+        axs[2,2].plot(x, term3[0,:], color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
+        axs[1,2].plot(x, ep_mean, color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
 
-
-
-    axs[-1,0].set_xticks([-20,-10,0,10,20])
-    axs[-1,1].set_xticks([-20,-10,0,10,20])
-    axs[-1,2].set_xticks([-20,-10,0,10,20])
-
-    titles=['(a) Fh', '(b) Q','(c) Mu','(d) hb-hm','(e) '+r'$\Delta$'+'s',
-            '(f) '+r'$\epsilon_p$', '(g) Fh/(hb-hm)','(h) Q/'+r'$\Delta$'+'s',
-            '(i) <qv>']
+    titles=['(a) Fh', '(b) Q','(c) Mu','(d) hb-hm','(e) S',
+            '(f) '+r'$\epsilon_p$', '(g) Fh/(hb-hm)','(h) Q/S',
+            '(i) $\langle$q'+r'$_{v}\rangle$']
             #'(i) (1-'+r'$\epsilon_p$'+')Mu']
     for i,ax in enumerate(axs.flat):
         ax.set_xlim(-20,20)
         ax.set_title(titles[i])
         ax.tick_params(axis='x')
         ax.tick_params(axis='y')
+        ax.xaxis.set_minor_locator(MultipleLocator(5))
+        
+    xthicks = ['15\u00b0S','0\u00b0N','15\u00b0N']
+    for i in range(3):
+        axs[-1,i].set_xticks([-15,0,15])
+        axs[-1,i].set_xticklabels(xthicks)
 
     axs[0,0].set_ylim(88,160)
     axs[0,0].set_ylabel('[W m'+r'$^{-2}$'+']')
     axs[0,1].set_ylim(0,0.03)
+    axs[0,1].set_ylabel('[W m'+r'$^{-3}$'+']')
     axs[1,0].set_ylim(7,12)
     axs[1,0].set_ylabel('[kJ kg'+r'$^{-1}$'+']')
-    axs[1,1].set_ylim(12,17)
-    #axs[1,1].label_outer()
+    axs[1,1].set_ylim(13,15)
+    axs[1,1].set_ylabel('[J kg'+r'$^{-1}$ m'+r'$^{-1}$'+']')
+    
     axs[2,0].set_ylim(0.008,0.016)
     axs[2,1].set_ylim(0,0.008)
-    axs[2,2].set_ylim(0,5)
+    axs[2,2].set_ylim(2,4.5)
+    axs[2,2].set_ylabel('[g kg$^{-1}$]')
     axs[2,0].set_ylabel('[kg m'+r'$^{-2}$'+' s'+r'$^{-1}$'+']')
-    #axs[1,2].set_ylabel('[kg m'+r'$^{-2}$'+' s'+r'$^{-1}$'+']',fontsize=fs)
+    axs[2,1].set_ylabel('[kg m'+r'$^{-2}$'+' s'+r'$^{-1}$'+']')
+    
     axs[0,2].set_ylim(0.01,0.06)
+    axs[0,2].set_ylabel('[kg m'+r'$^{-2}$'+' s'+r'$^{-1}$'+']')
     axs[1,2].set_ylim(0.0,1.1)
 
 
@@ -155,7 +162,7 @@ if __name__ == "__main__":
     #axs[0,2].set_ylabel('[kg m'+r'$^{-2}$'+' s'+r'$^{-1}$'+']',fontsize=fs)
     #axs[0,2].set_ylabel('[mm day'+r'$^{-1}$'+']')
 
-    axs[2,1].legend(loc='center',frameon=False, ncol=2)
+    axs[2,1].legend(loc='lower center', bbox_to_anchor=(0.5,-0.7),frameon=False, ncol=3)
     #plt.subplots_adjust(bottom = 0.05)
 
     #for i in range(3):
