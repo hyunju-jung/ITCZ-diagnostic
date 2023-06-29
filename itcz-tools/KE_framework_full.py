@@ -83,6 +83,18 @@ if __name__ == "__main__":
         #Estimate ep and Mu
         ep=prec.values/(qv_h.values*(term1 - term2.values)+prec.values)
         Mu = 1/(1-ep.values)*(term1 - term2.values)
+        
+        #-----to print out quantitative values-------------------------
+        weight = np.cos(np.radians(hb_hm.lat.values))
+        weight = weight[np.newaxis, : , np.newaxis]
+
+        print('---------ITCZ: %s---------' % od)
+        print('prec: %.2f' %  (prec * weight * 86400.).sel(lat = slice(-5,5)).mean())
+        print('<qv>: %.2f' %  (qv_h * weight *1000.).sel(lat = slice(-5,5)).mean())
+        print('Mu: %.4f' %  (Mu * weight).sel(lat = slice(-5,5)).mean())
+        print('ep: %.3f' %  (ep * weight).sel(lat = slice(-5,5)).mean())
+        print('Fh: %.1f' %  (Fh * weight).sel(lat = slice(-10,10)).mean())
+        #---------------------------------------------------------------
 
         #time and zonal mean for visualization
         ep_mean = np.nanmean(ep[0,...], axis=1)
@@ -114,8 +126,8 @@ if __name__ == "__main__":
         axs[2,2].plot(x, term3[0,:], color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
         axs[1,2].plot(x, ep_mean, color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
 
-    titles=['(a) Fh', '(b) Q','(c) Mu','(d) hb-hm','(e) S',
-            '(f) '+r'$\epsilon_p$', '(g) Fh/(hb-hm)','(h) Q/S',
+    titles=['(a) Fh', '(d) Q','(g) Mu','(b) hb-hm','(e) S',
+            '(h) '+r'$\epsilon_p$', '(c) Fh/(hb-hm)','(f) Q/S',
             '(i) $\langle$q'+r'$_{v}\rangle$']
             #'(i) (1-'+r'$\epsilon_p$'+')Mu']
     for i,ax in enumerate(axs.flat):
