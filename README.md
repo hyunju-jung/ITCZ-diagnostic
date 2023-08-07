@@ -1,3 +1,3 @@
-# ITCZ-diagnostics
+# ITCZ-diagnostic
 
 Currently code documenting.
