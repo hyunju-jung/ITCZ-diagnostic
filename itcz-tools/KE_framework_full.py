@@ -20,7 +20,7 @@ lw=2
 ls = list(['solid'])*4 + list(['dashdot'])*2
 zo=[0,3,1,2,4,5]
 
-height_b = 84.
+height_b = 84. #86.: limits for the shallowest BL height
 hm_1=84.
 hm_2=67.
 
@@ -89,11 +89,12 @@ if __name__ == "__main__":
         weight = weight[np.newaxis, : , np.newaxis]
 
         print('---------ITCZ: %s---------' % od)
-        print('prec: %.2f' %  (prec * weight * 86400.).sel(lat = slice(-5,5)).mean())
-        print('<qv>: %.2f' %  (qv_h * weight *1000.).sel(lat = slice(-5,5)).mean())
-        print('Mu: %.4f' %  (Mu * weight).sel(lat = slice(-5,5)).mean())
-        print('ep: %.3f' %  (ep * weight).sel(lat = slice(-5,5)).mean())
-        print('Fh: %.1f' %  (Fh * weight).sel(lat = slice(-10,10)).mean())
+        print('prec: %.2f' %  (prec * weight * 86400.).sel(lat = slice(3,5)).mean())
+        #print('<qv>: %.2f' %  (qv_h * weight *1000.).sel(lat = slice(7,17)).mean())
+        print('<qv>: %.2f' %  (qv_h * weight *1000.).sel(lat = slice(3,5)).mean())
+        print('Mu: %.4f' %  (Mu * weight).sel(lat = slice(3,5)).mean())
+        #print('ep: %.3f' %  (ep * weight).sel(lat = slice(-17,-7)).mean())
+        #print('S: %.1f' %  (delta_S * weight).sel(lat = slice(-15,15)).mean())
         #---------------------------------------------------------------
 
         #time and zonal mean for visualization
@@ -126,9 +127,10 @@ if __name__ == "__main__":
         axs[2,2].plot(x, term3[0,:], color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
         axs[1,2].plot(x, ep_mean, color=colors[i], lw=lw, ls=ls[i], zorder=zo[i])
 
-    titles=['(a) Fh', '(d) Q','(g) Mu','(b) hb-hm','(e) S',
-            '(h) '+r'$\epsilon_p$', '(c) Fh/(hb-hm)','(f) Q/S',
-            '(i) $\langle$q'+r'$_{v}\rangle$']
+    titles=['(a) F$_\mathrm{h}$', '(d) $\dot \mathrm{Q}$','(g) M$_\mathrm{u}$',
+            '(b) h$_\mathrm{b}$-h$_\mathrm{m}$','(e) S','(h) '+r'$\epsilon_p$',
+            '(c) F$_\mathrm{h}$/(h$_\mathrm{b}$-h$_\mathrm{m}$)',
+            '(f) $\dot \mathrm{Q}$/S','(i) $\langle$q'+r'$_{v}\rangle$']
             #'(i) (1-'+r'$\epsilon_p$'+')Mu']
     for i,ax in enumerate(axs.flat):
         ax.set_xlim(-20,20)
@@ -142,7 +144,7 @@ if __name__ == "__main__":
         axs[-1,i].set_xticks([-15,0,15])
         axs[-1,i].set_xticklabels(xthicks)
 
-    axs[0,0].set_ylim(88,160)
+    axs[0,0].set_ylim(85,160)
     axs[0,0].set_ylabel('[W m'+r'$^{-2}$'+']')
     axs[0,1].set_ylim(0,0.03)
     axs[0,1].set_ylabel('[W m'+r'$^{-3}$'+']')
