@@ -37,8 +37,8 @@ def cal_fluxes(odir, da):
     Translate accumlated variables such as surface latent heat flux
     into 'instanteneous' variables.
     
-    Inputs
-    ------
+    Parameters
+    ----------
     odir: directory that indicates what aquachannel runs is
     da: DataArray of accumulated field
     
@@ -74,8 +74,8 @@ def drop_timestep(ds):
     """
     Drop time step that is not intended to simulate
     
-    Paramters
-    ---------
+    Parameters
+    ----------
     ds : xarray.Dataset or xarray.DataArray
     
     Returns
