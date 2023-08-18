@@ -26,4 +26,4 @@ Output variables:
 | $M_u$                 | Convective updraft mass flux                |
 | $\epsilon_p$          | Precipitation efficiency                    |
 
-The core script is `itcz-tools/KE_framework_full.py`, but all input variables have to be specificied. Currently, the code is not flexible.
+The core script is `itcz-tools/KE_framework_full.py`, but all input variables have to be specified. Currently, the code is not flexible.
