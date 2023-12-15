@@ -1,7 +1,7 @@
 # ITCZ-diagnostic
 
 This tool allows you to identify sources of rainfall differences in simulations, which is based on a conceptual framework by [Emanuel, 2019](https://doi.org/10.1175/JAS-D-18-0090.1).<br>
-A detailed description of the tool can be found in [Jung et al., 2023](https://doi.org/10.5194/wcd-2023-7), which is currently under review.
+A detailed description of the tool can be found in [Jung et al., 2023](https://doi.org/10.5194/wcd-4-1111-2023), which is currently under review.
 
 Using this tool, you can calculate convective updraft mass flux $M_u$ and precipitation efficiency $\epsilon_p$ in a physically consistent way through the equations:
 
